@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -9,10 +9,20 @@ import { Observable } from 'rxjs';
 })
 export class AppComponent {
 
-  projects$: Observable<any>;
-  
-  constructor(private http: HttpClient) {
-    this.projects$ = this.http.get('http://localhost:3000/projects');
+  private readonly refreshToken$ = new BehaviorSubject(undefined);
+
+  readonly projects$: Observable<any> =
+    combineLatest([this.refreshToken$])
+      .pipe(switchMap(() => this.getProjects()));
+
+  constructor(private readonly http: HttpClient) { }
+
+  getProjects(): Observable<any> {
+    return this.http.get('http://localhost:3000/projects');
   }
-  
- }
+
+  refresh(): void {
+    this.refreshToken$.next(undefined);
+  }
+
+}

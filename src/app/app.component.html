@@ -1,3 +1,5 @@
-{{projects$ | async}}
+<ng-template *ngIf="projects$ | async"></ng-template>
+
+<button (click)="refresh()">REFRESH</button>
 
 <p-toast></p-toast>
